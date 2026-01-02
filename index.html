@@ -1443,7 +1443,6 @@
                             </label>
                             <select id="arrivalAirline" class="modern-select">
                                 <option value="emirates">Emirates</option>
-                                <option value="flydubai">Fly Dubai (All Flights)</option>
                                 <option value="aircanada">Air Canada</option>
                                 <option value="united">United Airlines</option>
                                 <option value="other">Other Airlines</option>
@@ -1522,7 +1521,6 @@
                             </label>
                             <select id="departureAirline" class="modern-select">
                                 <option value="emirates">Emirates</option>
-                                <option value="flydubai">Fly Dubai (All Flights)</option>
                                 <option value="aircanada">Air Canada</option>
                                 <option value="united">United Airlines</option>
                                 <option value="other">Other Airlines</option>
@@ -2126,7 +2124,7 @@
                 select.style.backgroundImage = '';
                 
                 if (isDarkMode) {
-                    select.style.backgroundImage = "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")";
+                    select.style.backgroundImage = "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")";
                 } else {
                     select.style.backgroundImage = "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")";
                 }
@@ -2375,8 +2373,6 @@
                 let requiredTime = 0;
                 let ruleDescription = "";
                 
-                // Note: Fly Dubai (All Flights) has no specific rules
-                
                 // Rule 1: Emirates to Emirates same concourse, A to B/B to A, B to C/C to B
                 if (arrivalAirline === 'emirates' && departureAirline === 'emirates' && 
                     arrivalTerminal === 'terminal3' && departureTerminal === 'terminal3') {
@@ -2431,10 +2427,12 @@
                 }
                 
                 // Rule 6: Emirates to Fly Dubai (FZ1 Series) and vice versa
-                // Note: This is separate from "Fly Dubai (All Flights)" which has no rules
-                if (arrivalAirline === 'flydubai' && departureAirline === 'emirates' ||
-                    arrivalAirline === 'emirates' && departureAirline === 'flydubai') {
-                    // Only apply if it's FZ1 series (which would need additional input to determine)
+                // Note: This rule is only for FZ1 series
+                if (
+                    (arrivalAirline === 'emirates' && departureAirline === 'other') ||
+                    (arrivalAirline === 'other' && departureAirline === 'emirates')
+                ) {
+                    // For Fly Dubai FZ1 series, it would need additional detection
                     // For now, treat as general connection
                     requiredTime = 0; // Will fall back to default
                 }
@@ -2454,13 +2452,13 @@
                 if (
                     (arrivalAirline === 'emirates' && arrivalTerminal === 'terminal3' && 
                      departureAirline !== 'emirates' && departureTerminal === 'terminal2' &&
-                     !(departureAirline === 'flydubai' && arrivalTerminal === 'terminal3')) ||
+                     !(departureAirline === 'other' && arrivalTerminal === 'terminal3')) ||
                     (arrivalAirline !== 'emirates' && arrivalTerminal === 'terminal2' && 
                      departureAirline === 'emirates' && departureTerminal === 'terminal3' &&
-                     !(arrivalAirline === 'flydubai' && arrivalTerminal === 'terminal2'))
+                     !(arrivalAirline === 'other' && arrivalTerminal === 'terminal2'))
                 ) {
                     requiredTime = 120;
-                    ruleDescription = "Emirates Terminal 3 to Flydubai/other airlines Terminal 2 and vice versa";
+                    ruleDescription = "Emirates Terminal 3 to other airlines Terminal 2 and vice versa";
                 }
                 
                 // Default rule if no specific rule matches
